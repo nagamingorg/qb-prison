@@ -97,7 +97,6 @@ end)
 
 RegisterNetEvent('prison:server:JailAlarm', function()
     if AlarmActivated then return end
-    print('Jail alarm server event activated')
     local playerPed = GetPlayerPed(source)
     local coords = GetEntityCoords(playerPed)
     local middle = vec2(Config.Locations["middle"].coords.x, Config.Locations["middle"].coords.y)
