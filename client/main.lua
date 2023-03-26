@@ -250,7 +250,7 @@ RegisterNetEvent('prison:client:Enter', function(time)
 	SetEntityCoords(PlayerPedId(), RandomStartPosition.coords.x, RandomStartPosition.coords.y, RandomStartPosition.coords.z - 0.9, 0, 0, 0, false)
 	SetEntityHeading(PlayerPedId(), RandomStartPosition.coords.w)
 	Wait(500)
-	TriggerEvent('animations:client:EmoteCommandStart', {RandomStartPosition.animation})
+	--TriggerEvent('animations:client:EmoteCommandStart', {RandomStartPosition.animation})
 
 	inJail = true
 	jailTime = time
@@ -297,7 +297,7 @@ RegisterNetEvent('prison:client:Leave', function()
 		while not IsScreenFadedOut() do
 			Wait(10)
 		end
-		TriggerServerEvent('qb-clothes:loadPlayerSkin')
+		TriggerEvent('illenium-appearance:client:reloadSkin')
 		SetEntityCoords(PlayerPedId(), Config.Locations["outside"].coords.x, Config.Locations["outside"].coords.y, Config.Locations["outside"].coords.z, 0, 0, 0, false)
 		SetEntityHeading(PlayerPedId(), Config.Locations["outside"].coords.w)
 
@@ -308,6 +308,9 @@ RegisterNetEvent('prison:client:Leave', function()
 end)
 
 RegisterNetEvent('prison:client:UnjailPerson', function()
+	--local src = source
+  --local Player = QBCore.Functions.GetPlayer(src)
+	--if not Player then return end
 	if jailTime > 0 then
 		TriggerServerEvent("prison:server:SetJailStatus", 0)
 		TriggerServerEvent("prison:server:GiveJailItems")
@@ -329,7 +332,7 @@ RegisterNetEvent('prison:client:UnjailPerson', function()
 		while not IsScreenFadedOut() do
 			Wait(10)
 		end
-		TriggerServerEvent('qb-clothes:loadPlayerSkin')
+		TriggerEvent('illenium-appearance:client:reloadSkin')
 		SetEntityCoords(PlayerPedId(), Config.Locations["outside"].coords.x, Config.Locations["outside"].coords.y, Config.Locations["outside"].coords.z, 0, 0, 0, false)
 		SetEntityHeading(PlayerPedId(), Config.Locations["outside"].coords.w)
 		Wait(500)
@@ -392,7 +395,7 @@ CreateThread(function()
 				exports['qb-core']:HideText()
 			end
 		end)
-		canteen = BoxZone:Create(vector3(Config.Locations["shop"].coords.x, Config.Locations["shop"].coords.y, Config.Locations["shop"].coords.z), 2.75, 7.75, {
+		canteen = BoxZone:Create(vector3(Config.Locations["shop"].coords.x, Config.Locations["shop"].coords.y, Config.Locations["shop"].coords.z), 4, 4, {
 			name="canteen",
 			debugPoly = false,
 		})
