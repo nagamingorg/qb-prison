@@ -22,6 +22,45 @@ local Gates = {
     }
 }
 
+local prisonPoly = PolyZone:Create({
+  vector2(1812.8409423828, 2488.8833007813),
+  vector2(1808.3549804688, 2474.6867675781),
+  vector2(1762.1049804688, 2427.0930175781),
+  vector2(1748.4509277344, 2420.1403808594),
+  vector2(1667.9564208984, 2408.2248535156),
+  vector2(1652.3533935547, 2410.3054199219),
+  vector2(1558.7917480469, 2469.4399414063),
+  vector2(1551.2701416016, 2483.2243652344),
+  vector2(1547.6010742188, 2576.23046875),
+  vector2(1548.4105224609, 2591.34375),
+  vector2(1576.4735107422, 2667.3779296875),
+  vector2(1585.4289550781, 2679.7072753906),
+  vector2(1649.0562744141, 2741.4594726563),
+  vector2(1662.2185058594, 2748.1357421875),
+  vector2(1762.4670410156, 2751.8334960938),
+  vector2(1775.8333740234, 2746.7290039063),
+  vector2(1829.2827148438, 2703.3413085938),
+  vector2(1834.5283203125, 2688.322265625),
+  vector2(1809.7009277344, 2611.9575195313),
+  vector2(1818.537109375, 2611.9541015625),
+  vector2(1818.8004150391, 2596.931640625),
+  vector2(1844.8937988281, 2597.1130371094),
+  vector2(1845.3977050781, 2568.2805175781),
+  vector2(1832.6966552734, 2568.2883300781),
+  vector2(1832.5364990234, 2579.4790039063),
+  vector2(1825.7023925781, 2578.9375),
+  vector2(1825.796875, 2591.5773925781),
+  vector2(1808.3248291016, 2591.5007324219),
+  vector2(1808.1002197266, 2569.1997070313),
+  vector2(1806.4140625, 2535.3442382813)
+}, {
+  name="prisonYard",
+  minZ = 43,
+  maxZ = 70,
+  debugPoly = true,
+  gridDivisions = 30
+})
+
 -- Functions
 
 --- This will be triggered once a hack is done on a gate
@@ -173,7 +212,7 @@ CreateThread(function()
         currentGate = 0
         local sleep = 1000
         if LocalPlayer.state.isLoggedIn then
-            if PlayerJob.name ~= "police" then
+            if PlayerJob.type ~= "leo" then
                 local pos = GetEntityCoords(PlayerPedId())
                 for k in pairs(Gates) do
                     local dist =  #(pos - Gates[k].coords)
@@ -207,23 +246,30 @@ end)
 
 CreateThread(function()
     while true do
-        local pos = GetEntityCoords(PlayerPedId(), true)
-        if #(pos.xy - vec2(Config.Locations["middle"].coords.x, Config.Locations["middle"].coords.y)) > 200 and inJail then
-            inJail = false
-            jailTime = 0
-            RemoveBlip(currentBlip)
-            RemoveBlip(CellsBlip)
-            CellsBlip = nil
-            RemoveBlip(TimeBlip)
-            TimeBlip = nil
-            RemoveBlip(ShopBlip)
-            ShopBlip = nil
-            TriggerServerEvent("prison:server:SecurityLockdown")
-            TriggerEvent("prison:client:PrisonBreakAlert")
-            TriggerServerEvent("prison:server:SetJailStatus", 0)
-            TriggerServerEvent("prison:server:GiveJailItems", true)
-            QBCore.Functions.Notify(Lang:t("error.escaped"), "error")
-        end
-        Wait(1000)
+      local pos = GetEntityCoords(PlayerPedId(), true)
+      local insidePrisonZone = prisonPoly:isPointInside(pos)
+      if insidePrisonZone and inJail then
+        DisableControlAction(0, 24, true) -- Attack
+        DisableControlAction(0, 257, true) -- Attack 2
+        DisableControlAction(0, 25, true) -- Aim
+        DisableControlAction(0, 263, true) -- Melee Attack 1
+        DisableControlAction(0, 264, true) -- Melee Attack 2
+      elseif not insidePrisonZone and inJail then
+        inJail = false
+        jailTime = 0
+        RemoveBlip(currentBlip)
+        RemoveBlip(CellsBlip)
+        CellsBlip = nil
+        RemoveBlip(TimeBlip)
+        TimeBlip = nil
+        RemoveBlip(ShopBlip)
+        ShopBlip = nil
+        TriggerServerEvent("prison:server:SecurityLockdown")
+        TriggerEvent("prison:client:PrisonBreakAlert")
+        TriggerServerEvent("prison:server:SetJailStatus", 0)
+        TriggerServerEvent("prison:server:GiveJailItems", true)
+        QBCore.Functions.Notify(Lang:t("error.escaped"), "error")
+      end
+      Wait(1000)
     end
 end)
